@@ -1,3 +1,5 @@
+package ru.lion_of_steel
+
 import java.time.LocalDateTime
 
 /*
