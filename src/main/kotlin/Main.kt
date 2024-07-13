@@ -1,10 +1,6 @@
 import java.time.LocalDateTime
 
 /*
-В качестве примера возьмём ВКонтакте: https://vk.com/dev/objects/post.
-
-Success: Data-класс Post (и другие классы, которые могут быть вложены в Post).
-TODO Объект WallService, который хранит посты в массиве.
 TODO ФУНКЦИЯ СОЗДАНИЯ ЗАПИСИ
 TODO функция обновления записи
 TODO WALL TESTS:
@@ -13,6 +9,7 @@ TODO WALL TESTS:
  2.На функцию обновления записи.
   *изменяем пост с существующим id, возвращается true,
   *изменяем пост с несуществующим id, возвращается false
+TODO Refactoring и улучшения.
  */
 data class Post(
     val idPost: Int,// id поста
@@ -56,6 +53,21 @@ class Reposts(
 class Views(
     private val count: Int = 0// количество просмотров.
 )
+
+object WallService {
+    private var posts = emptyArray<Post>();
+
+    fun postAdd(post: Post): Post {
+        TODO("Завершить")
+        return post
+
+    }
+    fun update(idPost: Int): Boolean {
+        TODO("Завершить")
+
+    }
+
+}
 
 fun main() {
 
