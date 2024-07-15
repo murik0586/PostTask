@@ -2,10 +2,6 @@ package ru.lion_of_steel
 
 import java.time.LocalDateTime
 
-/*
-
-TODO Refactoring и улучшения.
- */
 data class Post(
     val idPost: Int,// id поста
     val authorId: Int = 0,// id автора
@@ -13,10 +9,10 @@ data class Post(
     val date: LocalDateTime = LocalDateTime.now(), // время публикации
     val contentText: String = "Здесь какой-то контент",// Контент
     val friendsOnly: Boolean = false,// Только для друзей ли
-    val comments: Comments = Comments(0, true),// Комментарии
+    val comments: Comments = Comments(),// Комментарии
     val likes: Likes = Likes(),//лайки
     val reposts: Reposts = Reposts(),//репосты
-    val views: Views = Views(),// просмотры
+    val views: Views = Views(10),// просмотры
     val postType: String = "Репост",//Тип записи, принимает значения: post, copy, reply, postpone, suggest.
     val canPin: Boolean = false,//может ли текущий пользователь закрепить запись
     val canDelete: Boolean = false,//может ли пользователь удалить запись
@@ -28,25 +24,25 @@ data class Post(
 )
 
 class Comments(
-    val count: Int = 0,//количество комментариев.
-    val canPost: Boolean = true,//может ли текущий пользователь комментировать.
-    val canClose: Boolean = false,//может ли текущий пользователь закрыть комментарии.
-    val canOpen: Boolean = false//может ли текущий пользователь открыть комментарии.
+    private var count: Int = 0,//количество комментариев.
+    private val canPost: Boolean = true,//может ли текущий пользователь комментировать.
+    private val canClose: Boolean = false,//может ли текущий пользователь закрыть комментарии.
+    private val canOpen: Boolean = false//может ли текущий пользователь открыть комментарии.
 )
 
 class Likes(
-    val count: Int = 0,//количество лайков.
-    val userLikes: Boolean = false,//наличие отметки «Мне нравится» от текущего пользователя
-    val canPublish: Boolean = false//может ли текущий пользователь сделать репост записи
+    private var count: Int = 0,//количество лайков.
+    private val userLikes: Boolean = false,//наличие отметки «Мне нравится» от текущего пользователя
+    private val canPublish: Boolean = false//может ли текущий пользователь сделать репост записи
 )
 
 class Reposts(
-    private val count: Int = 0,//число пользователей, скопировавших запись;
+    private var count: Int = 0,//число пользователей, скопировавших запись;
     private val userReposted: Boolean = false,//наличие репоста от текущего пользователя
 )
 
 class Views(
-    private val count: Int = 0// количество просмотров.
+    private var count: Int = 0// количество просмотров.
 )
 
 object WallService {
@@ -75,10 +71,5 @@ object WallService {
 }
 
 fun main() {
-    val post = WallService.postAdd(Post(0))
-    println(post)
-    val post2 = WallService.postAdd(Post(0))
-    println(post2)
-    val post3 = WallService.postAdd(Post(0))
-    println(post3)
+
 }
