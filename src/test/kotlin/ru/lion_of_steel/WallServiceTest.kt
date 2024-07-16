@@ -14,7 +14,8 @@ class WallServiceTest {
 
     @Test
     fun postAdd_IdPlus() {
-        val post = Post(1,postType = "audio")
+        var post = Post(1,postType = "audio")
+        post = post.copy(likes = updateLikes(post))
         val result = WallService.postAdd(post)
         assertEquals(1,result.idPost)
     }
@@ -22,13 +23,15 @@ class WallServiceTest {
 
     @Test
     fun update_True() {
-        val post = WallService.postAdd(Post(0,postType = "audio"))
+        var post = WallService.postAdd(Post(0,postType = "audio"))
+        post = post.copy(likes = updateLikes(post))
         val result = WallService.update(post)
         assertTrue(result)
     }
     @Test
     fun update_False() {
-        val post = Post(1,postType = "audio")
+        var post = Post(1,postType = "audio")
+        post = post.copy(likes = updateLikes(post))
         val result = WallService.update(post)
         assertFalse(result)
     }
