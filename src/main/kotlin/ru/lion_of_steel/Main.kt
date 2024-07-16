@@ -35,7 +35,7 @@ fun updateLikes(post: Post): Likes {
     val canPublish = post.likes.canPublish ?: false
 
     return Likes(post.likes.count, userLikes, canPublish)
-}
+} // новая функция
 
 class Comments(
     private var count: Int = 0,//количество комментариев.
@@ -66,7 +66,7 @@ class Views(
 }
 
 object WallService {
-    private var posts = emptyArray<Post>();
+    private var posts = emptyArray<Post>()
     private var postId = 0
 
     fun postAdd(post: Post): Post {
@@ -86,7 +86,7 @@ object WallService {
 
     fun clear() {
         posts = emptyArray()
-        postId = 0
+        postId = 1
     }
 }
 
