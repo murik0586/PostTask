@@ -76,7 +76,7 @@ object WallService {
         return posts.last()
     }
 
-    fun update(post: Post): Boolean {
+     fun update(post: Post): Boolean {
         for ((index, postFromPosts) in posts.withIndex()) {
             if (postFromPosts.idPost == post.idPost) {
                 posts[index] = post.copy()

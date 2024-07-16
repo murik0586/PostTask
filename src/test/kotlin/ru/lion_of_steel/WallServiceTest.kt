@@ -2,7 +2,7 @@ package ru.lion_of_steel
 
 import org.junit.Test
 
-import org.junit.Assert.*
+ import org.junit.Assert.*
 import org.junit.Before
 
 
