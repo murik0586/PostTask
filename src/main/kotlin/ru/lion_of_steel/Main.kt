@@ -48,9 +48,10 @@ class Likes(
     var count: Int = 0,//количество лайков.
     var userLikes: Boolean? = false,//наличие отметки «Мне нравится» от текущего пользователя
     var canPublish: Boolean? = false//может ли текущий пользователь сделать репост записи
-) { override fun toString(): String {
-    return String.format("понравилось: %d",count)
-}
+) {
+    override fun toString(): String {
+        return String.format("понравилось: %d", count)
+    }
 }
 
 class Reposts(
@@ -60,8 +61,9 @@ class Reposts(
 
 class Views(
     private var count: Int = 0// количество просмотров.
-) { override fun toString(): String {
-        return String.format("посмотрели: %d",count)
+) {
+    override fun toString(): String {
+        return String.format("посмотрели: %d", count)
     }
 }
 
