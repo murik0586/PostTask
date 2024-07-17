@@ -113,7 +113,9 @@ TASK 1: Success Nullable
 
 Все работает. Все применено, даже функция дополнительная написана
 
-TASK 2: Attachments
+TASK 2: Success Attachments
+
+Все выполнено. На примере интерфейса. Скоро в отдельной ветке будет версия на abstract классе
 
 TASK 3: Sealed-классы
 
