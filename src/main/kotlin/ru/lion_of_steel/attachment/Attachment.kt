@@ -1,8 +1,6 @@
 package ru.lion_of_steel.attachment
 
-interface Attachment {
-    val type: String
-}
+abstract class Attachment(open val type: String)
 
 class Audio(
     override val type: String = "Audio",
@@ -14,11 +12,9 @@ class Audio(
     val url: String? = null,
     val noSearch: Boolean? = null,
     val isHd: Boolean? = false
-) : Attachment
+) : Attachment(type)
 
-class AudioAttachment(audio: Audio) : Attachment {
-    override val type: String = audio.type
-}
+class AudioAttachment(audio: Audio) : Attachment (audio.type)
 
 
 class Video(
@@ -30,7 +26,7 @@ class Video(
     val duration: Int? = null,
     val firstFrame: Array<Frame>? = null,//Содержит массив объектов Frane
     val views: Int? = null,
-) : Attachment
+) : Attachment(type)
 
 class Frame( //Изображение первого кадра.
     val height: Int? = null,
@@ -39,9 +35,7 @@ class Frame( //Изображение первого кадра.
 )
 
 
-class VideoAttachment(video: Video) : Attachment {
-    override val type: String = video.type
-}
+class VideoAttachment(video: Video) : Attachment(video.type)
 
 class Photo(
     override val type: String = "Photo",
@@ -51,12 +45,9 @@ class Photo(
     val text: String? = null,
     val width: Int? = null,
     val height: Int? = null
-) : Attachment
+) : Attachment(type)
 
-class PhotoAttachment(photo: Photo): Attachment {
-    override val type  = photo.type
-}
-
+class PhotoAttachment(photo: Photo): Attachment(photo.type)
 class File(
     override val type: String = "File",
     val id: Int? = null,
@@ -65,11 +56,9 @@ class File(
     val size: Int? = null, //размер файла в байтах
     val ext: String? = null,// расширение файла
     val url: String? = null,// адрес файла, по которому можно загрузить
-) : Attachment
+) : Attachment(type)
 
-class FileAttachment(file: File): Attachment {
-    override val type = file.type
-}
+class FileAttachment(file: File): Attachment(file.type)
 
 class Link(
     override val type: String = "Link",
@@ -77,8 +66,6 @@ class Link(
     val title: String? = null,
     val description: String? = null,
     val photo: Photo? = null,
-) : Attachment
+) : Attachment(type)
 
-class LinkAttachment(link: Link) : Attachment {
-    override val type = link.type
-}
+class LinkAttachment(link: Link) : Attachment(link.type)
