@@ -1,5 +1,6 @@
 package ru.lion_of_steel
 
+import ru.lion_of_steel.attachment.*
 import java.time.LocalDateTime
 
 /*
@@ -19,6 +20,7 @@ data class Post(
     val comments: Comments? = Comments(),// Комментарии
     val likes: Likes = Likes(),//лайки
     val reposts: Reposts = Reposts(),//репосты
+    var attachment: List<Attachment> = listOf(),//Чтобы не ругалось на hashCode
     val views: Views = Views(10),// просмотры
     val postType: String?,//Тип записи, принимает значения: post, copy, reply, postpone, suggest.
     val canPin: Boolean? = false,//может ли текущий пользователь закрепить запись
@@ -38,10 +40,10 @@ fun updateLikes(post: Post): Likes {
 } // новая функция
 
 class Comments(
-    private var count: Int = 0,//количество комментариев.
-    private val canPost: Boolean = false,//может ли текущий пользователь комментировать.
-    private val canClose: Boolean = false,//может ли текущий пользователь закрыть комментарии.
-    private val canOpen: Boolean = false//может ли текущий пользователь открыть комментарии.
+    private var count: Int? = 0,//количество комментариев.
+    private val canPost: Boolean? = false,//может ли текущий пользователь комментировать.
+    private val canClose: Boolean? = false,//может ли текущий пользователь закрыть комментарии.
+    private val canOpen: Boolean? = false//может ли текущий пользователь открыть комментарии.
 )
 
 class Likes(
@@ -76,7 +78,7 @@ object WallService {
         return posts.last()
     }
 
-     fun update(post: Post): Boolean {
+    fun update(post: Post): Boolean {
         for ((index, postFromPosts) in posts.withIndex()) {
             if (postFromPosts.idPost == post.idPost) {
                 posts[index] = post.copy()
@@ -93,7 +95,16 @@ object WallService {
 }
 
 fun main() {
-    var post = Post(1, 1, 1, postType = "audio", likes = Likes(2000))
+    val photo = Photo(id = 1, albumId = 1, ownerId = 1, text = "A photo", width = 800, height = 600)
+    val video = Video(id = 1, ownerId = 1, title = "A Funny Video", description = "This is a funny video", duration = 30)
+    val audio = Audio(id = 1, ownerId = 1, artist = "Artist Name", title = "Track Title", duration = 180)
+    val file = File(id = 1, ownerId = 1, title = "Document Title", size = 1024, ext = "pdf", url = "https://vk.com/some_doc_link")
+    val link = Link(url = "https://example.com", title = "Example Link", description = "Example Description")
+    var post = Post(1, 1, 1, postType = "post", likes = Likes(2000), attachment = listOf(
+        PhotoAttachment(photo),
+        AudioAttachment(audio),
+        VideoAttachment(video)
+    ))
     post = post.copy(likes = updateLikes(post))
     println(post)
 
