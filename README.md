@@ -117,6 +117,8 @@ TASK 2: Success Attachments
 
 Все выполнено. На примере интерфейса. Скоро в отдельной ветке будет версия на abstract классе
 
-TASK 3: Sealed-классы
+TASK 3: Success Sealed-классы
+
+Все сделано. Все три способа рассмотрены. 
 
 TASK 4: REFACTORING
