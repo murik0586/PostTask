@@ -1,6 +1,7 @@
 package ru.lion_of_steel
 
 import ru.lion_of_steel.attachment.*
+import ru.lion_of_steel.exception.PostNotFoundException
 
 import java.time.LocalDateTime
 
@@ -38,6 +39,15 @@ class Comments(
     private val canPost: Boolean? = false,//может ли текущий пользователь комментировать.
     private val canClose: Boolean? = false,//может ли текущий пользователь закрыть комментарии.
     private val canOpen: Boolean? = false//может ли текущий пользователь открыть комментарии.
+
+)
+
+class Comment(
+    private var idComment: Int? = 0,//id комментария
+    private val fromId: Int? = 0,//id автора комментария
+    private val date: LocalDateTime? = LocalDateTime.now(),//дата
+    private val text: String? = "",//текст комментария
+    private var attachment: List<Attachment> = listOf()
 )
 
 class Likes(
@@ -65,7 +75,18 @@ class Views(
 
 object WallService {
     private var posts = emptyArray<Post>()
+    private var comments = emptyArray<Comment>()
     private var postId = 0
+
+    fun createComment(idPost: Int, comment: Comment): Comment {
+      for(post in posts) {
+          if(post.idPost == idPost) {
+              comments += comment
+              return comment
+          }
+      }
+      throw  PostNotFoundException("Пост с id: $idPost не найден")
+    }
 
     fun postAdd(post: Post): Post {
         posts += post.copy(idPost = ++postId)
@@ -84,6 +105,7 @@ object WallService {
 
     fun clear() {
         posts = emptyArray()
+        comments = emptyArray()
         postId = 0
     }
 }
@@ -109,7 +131,8 @@ fun main() {
     val link = Link(
         url = "https://example.com",
         title = "Example Link",
-        description = "Example Description")
+        description = "Example Description"
+    )
     var post = Post(
         1, 1, 1, postType = "post", likes = Likes(2000), attachment = listOf(
             PhotoAttachment(photo),
