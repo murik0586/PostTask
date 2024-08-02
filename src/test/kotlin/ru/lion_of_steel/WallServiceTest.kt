@@ -2,8 +2,9 @@ package ru.lion_of_steel
 
 import org.junit.Test
 
- import org.junit.Assert.*
+import org.junit.Assert.*
 import org.junit.Before
+import ru.lion_of_steel.exception.PostNotFoundException
 
 
 class WallServiceTest {
@@ -37,5 +38,17 @@ class WallServiceTest {
         assertFalse(result)
     }
 
+    @Test
+    fun createCommentReturnComment() {
+        WallService.postAdd(Post(1,1))
+        val comment = Comment(1)
+        val result = WallService.createComment(1, comment)
+        assertEquals(comment, result)
+    }
 
+    @Test(expected = PostNotFoundException::class)
+    fun createCommentExceptionNoPost() {
+        val comment = Comment(2)
+        WallService.createComment(1,comment)
+    }
 }

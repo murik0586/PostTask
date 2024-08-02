@@ -15,9 +15,9 @@ data class Post(
     val comments: Comments? = Comments(),// Комментарии
     val likes: Likes = Likes(),//лайки
     val reposts: Reposts = Reposts(),//репосты
-    var attachment: List<Attachment> = listOf(),//Чтобы не ругалось на hashCode
+    var attachment: List<Attachment>? = listOf(),//Чтобы не ругалось на hashCode
     val views: Views = Views(10),// просмотры
-    val postType: String?,//Тип записи, принимает значения: post, copy, reply, postpone, suggest.
+    val postType: String? = "post",//Тип записи, принимает значения: post, copy, reply, postpone, suggest.
     val canPin: Boolean? = false,//может ли текущий пользователь закрепить запись
     val canDelete: Boolean? = false,//может ли пользователь удалить запись
     val canEdit: Boolean? = false,//может ли текущий пользователь редактировать запись
