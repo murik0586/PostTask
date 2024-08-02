@@ -5,6 +5,8 @@ import org.junit.Test
 import org.junit.Assert.*
 import org.junit.Before
 import ru.lion_of_steel.exception.PostNotFoundException
+import ru.lion_of_steel.exception.ReasonNotReportException
+import ru.lion_of_steel.exception.ReportNoOwnerAndCommentIdException
 
 
 class WallServiceTest {
@@ -40,7 +42,7 @@ class WallServiceTest {
 
     @Test
     fun createCommentReturnComment() {
-        WallService.postAdd(Post(1,1))
+        WallService.postAdd(Post(1, 1))
         val comment = Comment(1)
         val result = WallService.createComment(1, comment)
         assertEquals(comment, result)
@@ -49,6 +51,29 @@ class WallServiceTest {
     @Test(expected = PostNotFoundException::class)
     fun createCommentExceptionNoPost() {
         val comment = Comment(2)
-        WallService.createComment(1,comment)
+        WallService.createComment(1, comment)
+    }
+
+    @Test(expected = ReportNoOwnerAndCommentIdException::class)
+    fun addReportCommentNoComment() {
+        WallService.addReportComment(1, 1, 0)
+
+    }
+
+    @Test(expected = ReasonNotReportException::class)
+    fun addReportCommentNoFoundReason() {
+        WallService.postAdd(Post(1, 2))
+        WallService.createComment(1, Comment(1, 1))
+        WallService.addReportComment(1, 1, 8)
+
+    }
+
+    @Test
+    fun addReportSuccess() {
+        WallService.postAdd(Post(1, 2))
+        WallService.createComment(1, Comment(1, 1))
+        val report = ReportComment(1, 1, 0, "Спам")
+        val result = WallService.addReportComment(1, 1, 0)
+        assertEquals(report, result)
     }
 }

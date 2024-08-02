@@ -2,6 +2,8 @@ package ru.lion_of_steel
 
 import ru.lion_of_steel.attachment.*
 import ru.lion_of_steel.exception.PostNotFoundException
+import ru.lion_of_steel.exception.ReasonNotReportException
+import ru.lion_of_steel.exception.ReportNoOwnerAndCommentIdException
 
 import java.time.LocalDateTime
 
@@ -42,13 +44,6 @@ class Comments(
 
 )
 
-class Comment(
-    private var idComment: Int? = 0,//id комментария
-    private val fromId: Int? = 0,//id автора комментария
-    private val date: LocalDateTime? = LocalDateTime.now(),//дата
-    private val text: String? = "",//текст комментария
-    private var attachment: List<Attachment> = listOf()
-)
 
 class Likes(
     var count: Int = 0,//количество лайков.
@@ -73,19 +68,58 @@ class Views(
     }
 }
 
+data class ReportComment(
+    val ownerId: Int = 0,// Идентификатор пользователя коммента(поле из класса Comment fromId)
+    val commentId: Int = 0,//id комментария
+    var reasonCode: Int = 0, //код причины жалобы
+    var msg: String = "" //причина жалобы в текстовом виде
+)
+
+data class Comment(
+    var idComment: Int? = 0,//id комментария
+    val fromId: Int? = 0,//id автора комментария
+    val date: LocalDateTime? = LocalDateTime.now(),//дата
+    val text: String? = " ",//текст комментария
+    var attachment: List<Attachment>? = listOf()
+)
+
 object WallService {
     private var posts = emptyArray<Post>()
     private var comments = emptyArray<Comment>()
+    private var reports = emptyArray<ReportComment>()
     private var postId = 0
 
+    fun addReportComment(idComment: Int, fromId: Int, reason: Int): ReportComment {
+        for (comment in comments) {
+            if (comment.idComment == idComment && comment.fromId == fromId) {
+                val msg = when (reason) {
+                    0 -> "Спам"
+                    1 -> "Детская порнография"
+                    2 -> "Экстремизм"
+                    3 -> "Насилие"
+                    4 -> "Пропаганда наркотиков"
+                    5 -> "Материал для взрослых"
+                    6 -> "Оскорбление"
+                    7 -> "Призывы к суициду."
+                    else -> throw ReasonNotReportException("Такой причины не существует")
+
+                }
+                val reportComment = ReportComment(fromId,idComment,reason,msg)
+                reports += reportComment.copy()
+                return reportComment
+            }
+        }
+        throw ReportNoOwnerAndCommentIdException("Несуществующий комментарий, возможно комментарий уже удален")
+    }
+
     fun createComment(idPost: Int, comment: Comment): Comment {
-      for(post in posts) {
-          if(post.idPost == idPost) {
-              comments += comment
-              return comment
-          }
-      }
-      throw  PostNotFoundException("Пост с id: $idPost не найден")
+        for (post in posts) {
+            if (post.idPost == idPost) {
+                comments += comment.copy()
+                return comment
+            }
+        }
+        throw PostNotFoundException("Пост с id: $idPost не найден")
     }
 
     fun postAdd(post: Post): Post {
