@@ -3,19 +3,20 @@ package ru.lion_of_steel.service
 import ru.lion_of_steel.model.Comment
 import ru.lion_of_steel.model.Post
 import ru.lion_of_steel.model.ReportComment
-import ru.lion_of_steel.exception.PostNotFoundException
+import ru.lion_of_steel.exception.NotFoundException
 import ru.lion_of_steel.exception.ReasonNotReportException
 import ru.lion_of_steel.exception.ReportNoOwnerAndCommentIdException
+import ru.lion_of_steel.model.Note
+
 //TODO Сначала создам для каждого класса свой отдельный сервис.
 //TODO Реализую все методы необходимые в задании - касательно заметок.
 //TODO Затем попробую использовать дженерики, сделать методы общими.
-//TODO А для этого я создам для них отдельный интерфейс.
 //Предполагаю, что здесь активно понадобятся операторы is и as - при необходимости прочитать.
 
-object WallPostService {
-    private var posts = emptyArray<Post>()
-    private var comments = emptyArray<Comment>()
-    private var reports = emptyArray<ReportComment>()
+object WallPostService : CrudService<Post> {
+    private var posts = mutableListOf<Post>()
+    private var comments = mutableListOf<Comment>()
+    private var reports = mutableListOf<ReportComment>()
     private var postId = 0
 
     fun addReportComment(idComment: Int, fromId: Int, reason: Int): ReportComment {
@@ -33,7 +34,7 @@ object WallPostService {
                     else -> throw ReasonNotReportException("Такой причины не существует")
 
                 }
-                val reportComment = ReportComment(fromId,idComment,reason,msg)
+                val reportComment = ReportComment(fromId, idComment, reason, msg)
                 reports += reportComment.copy()
                 return reportComment
             }
@@ -41,26 +42,26 @@ object WallPostService {
         throw ReportNoOwnerAndCommentIdException("Несуществующий комментарий, возможно комментарий уже удален")
     }
 
-    fun createComment(idPost: Int, comment: Comment): Comment {
+    override fun createComment(id: Int, comment: Comment): Comment {
         for (post in posts) {
-            if (post.idPost == idPost) {
+            if (post.id == id) {
                 comments += comment.copy()
-                return comment
+                return comments.last()
             }
         }
-        throw PostNotFoundException("Пост с id: $idPost не найден")
+        throw NotFoundException("Пост с id: $id не найден")
     }
 
-    fun postAdd(post: Post): Post {
-        posts += post.copy(idPost = ++postId)
+    override fun add(entity: Post): Post {
+        posts += entity.copy(id = ++postId)
         return posts.last()
     }
 
 
-    fun update(post: Post): Boolean {
+    override fun edit(entity: Post): Boolean {
         for ((index, postFromPosts) in posts.withIndex()) {
-            if (postFromPosts.idPost == post.idPost) {
-                posts[index] = post.copy()
+            if (postFromPosts.id == entity.id) {
+                posts[index] = entity.copy()
                 return true
             }
         }
@@ -68,12 +69,44 @@ object WallPostService {
     }
 
     fun clear() {
-        posts = emptyArray()
-        comments = emptyArray()
+        posts = mutableListOf()
+        comments = mutableListOf()
         postId = 0
     }
 }
 
-object WallNoteService  {
+object WallNoteService : CrudService<Note> {
+    private var notes = mutableListOf<Note>()
+    private var idNote = 0
+    private var comments = mutableListOf<Comment>()
 
+    override fun add(entity: Note): Note {
+        notes += entity.copy(id = ++idNote)
+        return notes.last()
+    }
+
+    override fun createComment(id: Int, comment: Comment): Comment {
+        for (note in notes) {
+            if (id == note.id) {
+                comments += comment.copy()
+                return comments.last()
+            }
+        }
+        throw NotFoundException("заметка с id: $id не найдена")
+    }
+
+    override fun edit(entity: Note): Boolean {
+        for ((index, noteFromNotes) in notes.withIndex()) {
+            if (idNote == noteFromNotes.id) {
+                notes[index] = entity.copy()
+                return true
+            }
+        }
+        return false
+    }
+
+    fun clear() {
+        notes = mutableListOf()
+        idNote = 0
+    }
 }

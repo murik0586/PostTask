@@ -4,7 +4,7 @@ import ru.lion_of_steel.attachment.Attachment
 import java.time.LocalDateTime
 
 data class Post(
-    val idPost: Int,// id поста
+   override val id: Int,// id поста
     val authorId: Int = 0,// id автора
     val ownerId: Int = 0, // id того, на чьей стене
     val date: LocalDateTime = LocalDateTime.now(), // время публикации
@@ -23,7 +23,7 @@ data class Post(
     val markedAsAds: Boolean? = false,//содержит ли запись отметку «реклама»
     val isFavorite: Boolean? = false,//добавлен в закладки у текущего пользователя.
     val postponedId: Boolean? = true//Идентификатор отложенной записи.
-)
+):Entity
 
 fun updateLikes(post: Post): Likes {
     val userLikes = post.likes.userLikes ?: false
