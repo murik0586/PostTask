@@ -42,7 +42,7 @@ class Comments(
 )
 
 
-class Likes(
+data class Likes(
     var count: Int = 0,//количество лайков.
     var userLikes: Boolean? = false,//наличие отметки «Мне нравится» от текущего пользователя
     var canPublish: Boolean? = false//может ли текущий пользователь сделать репост записи

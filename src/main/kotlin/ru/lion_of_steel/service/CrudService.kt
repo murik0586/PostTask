@@ -6,7 +6,7 @@ import ru.lion_of_steel.model.Comment
 interface CrudService<T> {
     fun add(entity: T): T
     fun edit(entity: T): Boolean
-    fun delete(idEntity:Int): Boolean
+    fun delete(idEntity:Int, entityType: Class<out T>): Boolean
     fun get(): T
     fun getById(idEntity: Int): T
 
