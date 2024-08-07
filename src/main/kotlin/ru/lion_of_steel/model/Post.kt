@@ -4,13 +4,13 @@ import ru.lion_of_steel.attachment.Attachment
 import java.time.LocalDateTime
 
 data class Post(
-   override val id: Int,// id поста
+    override val id: Int,// id поста
     val authorId: Int = 0,// id автора
     val ownerId: Int = 0, // id того, на чьей стене
     val date: LocalDateTime = LocalDateTime.now(), // время публикации
     val contentText: String = "Здесь какой-то контент",// Контент
     val friendsOnly: Boolean = false,// Только для друзей ли
-    val comments: Comments? = Comments(),// Комментарии
+    val comments: Comments = Comments(),// Комментарии
     val likes: Likes = Likes(),//лайки
     val reposts: Reposts = Reposts(),//репосты
     var attachment: List<Attachment>? = listOf(),//Чтобы не ругалось на hashCode
@@ -22,8 +22,9 @@ data class Post(
     val isPinned: Boolean? = true,//Информация о том, что запись закреплена.
     val markedAsAds: Boolean? = false,//содержит ли запись отметку «реклама»
     val isFavorite: Boolean? = false,//добавлен в закладки у текущего пользователя.
-    val postponedId: Boolean? = true//Идентификатор отложенной записи.
-):Entity
+    val postponedId: Boolean? = true,//Идентификатор отложенной записи.
+    var delete: Boolean = false,
+) : Entity
 
 fun updateLikes(post: Post): Likes {
     val userLikes = post.likes.userLikes ?: false
@@ -33,11 +34,11 @@ fun updateLikes(post: Post): Likes {
 } // новая функция
 
 class Comments(
-    private var count: Int? = 0,//количество комментариев.
-    private val canPost: Boolean? = false,//может ли текущий пользователь комментировать.
-    private val canClose: Boolean? = false,//может ли текущий пользователь закрыть комментарии.
-    private val canOpen: Boolean? = false//может ли текущий пользователь открыть комментарии.
-
+    var count: Int? = 0,//количество комментариев.
+    val canPost: Boolean? = false,//может ли текущий пользователь комментировать.
+    val canClose: Boolean? = false,//может ли текущий пользователь закрыть комментарии.
+    val canOpen: Boolean? = false,//может ли текущий пользователь открыть комментарии.
+    var commentList: List<Comment> = mutableListOf(),
 )
 
 
@@ -75,8 +76,9 @@ data class Comment(
     var idComment: Int? = 0,//id комментария
     val fromId: Int? = 0,//id автора комментария
     val date: LocalDateTime? = LocalDateTime.now(),//дата
-    val text: String? = " ",//текст комментария
-    var attachment: List<Attachment>? = listOf()
+    var text: String? = " ",//текст комментария
+    var attachment: List<Attachment>? = listOf(),
+    var delete: Boolean = false
 )
 
 

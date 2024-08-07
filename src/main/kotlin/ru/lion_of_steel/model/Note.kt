@@ -5,6 +5,8 @@ data class Note(
     var ownerId: Int,//идентификатор владельца
     var title: String,//заголовок заметки
     var text: String,//текст заметки
+    var delete:Boolean = false,
+    var comments: Comments = Comments()
     //потом добавить по необходимости еще свойств!
 
 ) : Entity
