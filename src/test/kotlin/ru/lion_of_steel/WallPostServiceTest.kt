@@ -11,7 +11,6 @@ import ru.lion_of_steel.model.Comment
 import ru.lion_of_steel.model.Post
 import ru.lion_of_steel.model.ReportComment
 import ru.lion_of_steel.model.updateLikes
-import ru.lion_of_steel.service.WallPostService
 import ru.lion_of_steel.service.WallService
 
 
