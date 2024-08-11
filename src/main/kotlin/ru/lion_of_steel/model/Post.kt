@@ -7,7 +7,7 @@ data class Post(
     override val id: Int,// id поста
     val authorId: Int = 0,// id автора
     val ownerId: Int = 0, // id того, на чьей стене
-    val date: LocalDateTime = LocalDateTime.now(), // время публикации
+    val date: LocalDateTime? = null, // время публикации
     val contentText: String = "Здесь какой-то контент",// Контент
     val friendsOnly: Boolean = false,// Только для друзей ли
     val comments: Comments = Comments(),// Комментарии
@@ -46,12 +46,12 @@ data class Likes(
     }
 }
 
-class Reposts(
+data class Reposts(
     private var count: Int = 0,//число пользователей, скопировавших запись;
     private val userReposted: Boolean = false,//наличие репоста от текущего пользователя
 )
 
-class Views(
+data class Views(
     private var count: Int = 0// количество просмотров.
 ) {
     override fun toString(): String {

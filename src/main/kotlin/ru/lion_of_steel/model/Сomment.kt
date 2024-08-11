@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 data class Comment (
     var idComment: Int? = 0,//id комментария
     val fromId: Int? = 0,//id автора комментария
-    val date: LocalDateTime? = LocalDateTime.now(),//дата
+    val date: LocalDateTime? = null,//дата
     var text: String? = " ",//текст комментария
     var attachment: List<Attachment>? = listOf(),
     var delete: Boolean = false,
@@ -18,7 +18,7 @@ data class ReportComment(
     var reasonCode: Int = 0, //код причины жалобы
     var msg: String = "" //причина жалобы в текстовом виде
 )
-class Comments(
+data class Comments(
     var count: Int? = 0,//количество комментариев.
     val canPost: Boolean? = false,//может ли текущий пользователь комментировать.
     val canClose: Boolean? = false,//может ли текущий пользователь закрыть комментарии.

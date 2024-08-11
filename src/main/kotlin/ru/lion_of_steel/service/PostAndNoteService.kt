@@ -8,36 +8,80 @@ object WallService : CrudService<Entity> {
     private var posts = mutableListOf<Post>()
     private var notes = mutableListOf<Note>()
     private var reports = mutableListOf<ReportComment>()
-    private var comments = mutableListOf<Comment>()
 
     private var postId = 0
     private var idNote = 0
     private var commentId = 0
 
-    fun addReportComment(idComment: Int, fromId: Int, reason: Int): ReportComment {
-        for (comment in comments) {
-            if (comment.idComment == idComment && comment.fromId == fromId) {
-                val msg = when (reason) {
-                    0 -> "Спам"
-                    1 -> "Детская порнография"
-                    2 -> "Экстремизм"
-                    3 -> "Насилие"
-                    4 -> "Пропаганда наркотиков"
-                    5 -> "Материал для взрослых"
-                    6 -> "Оскорбление"
-                    7 -> "Призывы к суициду."
-                    else -> throw ReasonNotReportException("Такой причины не существует")
+    fun addReportComment(
+        entityType: Class<out Entity>,
+        idEntity: Int,
+        idComment: Int,
+        fromId: Int,
+        reason: Int
+    ): ReportComment {
+        when (entityType) {
+            Post::class.java -> {
+                for (post in posts) {
+                    if (idEntity == post.id) {
+                        for (comment in post.comments.commentList) {
+                            if (comment.idComment == idComment && comment.fromId == fromId) {
+                                val msg = when (reason) {
+                                    0 -> "Спам"
+                                    1 -> "Детская порнография"
+                                    2 -> "Экстремизм"
+                                    3 -> "Насилие"
+                                    4 -> "Пропаганда наркотиков"
+                                    5 -> "Материал для взрослых"
+                                    6 -> "Оскорбление"
+                                    7 -> "Призывы к суициду."
+                                    else -> throw ReasonNotReportException("Такой причины не существует")
 
+                                }
+                                val reportComment = ReportComment(fromId, idComment, reason, msg)
+                                reports += reportComment.copy()
+                                return reportComment
+                            }
+                        }
+                        throw ReportNoOwnerAndCommentIdException("Несуществующий комментарий, возможно комментарий уже удален")
+                    }
                 }
-                val reportComment = ReportComment(fromId, idComment, reason, msg)
-                reports += reportComment.copy()
-                return reportComment
+                throw NotFoundException("Пост с id $idEntity - не найден")
             }
+
+            Note::class.java -> {
+                for (note in notes) {
+                    if (idEntity == note.id) {
+                        for (comment in note.comments.commentList) {
+                            if (comment.idComment == idComment && comment.fromId == fromId) {
+                                val msg = when (reason) {
+                                    0 -> "Спам"
+                                    1 -> "Детская порнография"
+                                    2 -> "Экстремизм"
+                                    3 -> "Насилие"
+                                    4 -> "Пропаганда наркотиков"
+                                    5 -> "Материал для взрослых"
+                                    6 -> "Оскорбление"
+                                    7 -> "Призывы к суициду."
+                                    else -> throw ReasonNotReportException("Такой причины не существует")
+
+                                }
+                                val reportComment = ReportComment(fromId, idComment, reason, msg)
+                                reports += reportComment.copy()
+                                return reportComment
+                            }
+                        }
+                        throw ReportNoOwnerAndCommentIdException("Несуществующий комментарий, возможно комментарий уже удален")
+                    }
+                }
+                throw NotFoundException("Заметка с id $idEntity - не найден")
+            }
+
+            else -> throw NotMatchTypeException("Тип объекта не соответствует")
         }
-        throw ReportNoOwnerAndCommentIdException("Несуществующий комментарий, возможно комментарий уже удален")
     }
 
-    override fun add(entity: Entity): Entity {
+    override fun add(entity: Entity): Entity? {
         return when (entity) {
             is Post -> {
                 posts += entity.copy(id = ++postId)
@@ -50,7 +94,7 @@ object WallService : CrudService<Entity> {
 
             }
 
-            else -> throw NotMatchTypeException("Тип объекта не соответствует")
+            else -> null
         }
     }
 
@@ -121,30 +165,33 @@ object WallService : CrudService<Entity> {
         }
     }
 
-    override fun get(entityType: Class<out Entity>): Entity {
+    override fun get(entityType: Class<out Entity>): List<Entity> {
+        val resultList = mutableListOf<Entity>()
         when (entityType) {
             Post::class.java -> {
                 for (post in posts) {
-                    if (!post.delete) {
-                        return post
-                    }
+                    if (!post.delete) resultList.add(post)
+
                 }
-                println("\n")
-                throw NotFoundException("У вас нет заметок!")
+                if (resultList.isEmpty()) {
+                    throw NotFoundException("У вас нет постов!")
+                }
             }
 
             Note::class.java -> {
                 for (note in notes) {
-                    if (!note.delete) return note
+                    if (!note.delete) resultList.add(note)
                 }
-                println("\n")
-                throw NotFoundException("У вас нет заметок!")
+                if (resultList.isEmpty()) {
+                    throw NotFoundException("У вас нет заметок!")
+                }
             }
 
             else -> {
                 throw NotMatchTypeException("Тип объекта не соответствует")
             }
         }
+        return resultList
     }
 
     override fun getById(idEntity: Int, entityType: Class<out Entity>): Entity {
@@ -176,9 +223,8 @@ object WallService : CrudService<Entity> {
             Post::class.java -> {
                 for (post in posts) {
                     if (post.id == id) {
-                        comments += comment.copy(idComment = ++commentId)
                         post.comments.commentList += comment.copy(idComment = ++commentId) //идея как закинуть именно в комментарии поста
-                        return comments.last()
+                        return post.comments.commentList.last()
                     }
                 }
                 throw NotFoundException("Пост с id: $id не найден")
@@ -187,9 +233,8 @@ object WallService : CrudService<Entity> {
             Note::class.java -> {
                 for (note in notes) {
                     if (id == note.id) {
-                        comments += comment.copy(idComment = ++commentId) //Todo - подумать, стоит ли увеличивать автоматически id
                         note.comments.commentList += comment.copy(idComment = ++commentId)
-                        return comments.last()
+                        return note.comments.commentList.last()
                     }
                 }
                 throw NotFoundException("заметка с id: $id не найдена")
@@ -201,37 +246,45 @@ object WallService : CrudService<Entity> {
         }
     }
 
-    //TODO начиная с удаления исправить код чтобы удалялось все у конкретного поста и конкретного note
-    override fun deleteComment(entityType: Class<out Entity>, id: Int): Boolean {
+
+    override fun deleteComment(entityType: Class<out Entity>, idEntity: Int, id: Int): Boolean {
         when (entityType) {
             Post::class.java -> {
-                for (comment in comments) {
-                    if (id == comment.idComment) {
-                        if (!comment.delete) {
-                            comment.delete//делаем true
-                            return true
-                        } else {
-                            throw AccessDeniedException("Ошибка доступа: Комментарий уже удален")
+                for (post in posts) {
+                    if (idEntity == post.id) {
+                        for (comment in post.comments.commentList) {
+                            if (id == comment.idComment) {
+                                if (!comment.delete) {
+                                    comment.delete//делаем true
+                                    return true
+                                } else {
+                                    throw AccessDeniedException("Ошибка доступа: Комментарий уже удален")
+                                }
+                            }
                         }
+                        throw NotFoundException("Комментарий с id $id - не найден")
                     }
                 }
-                throw NotFoundException("Комментарий с id $id - не найден")
+                throw NotFoundException("Пост с id $idEntity не найден")
             }
 
             Note::class.java -> {
-                for (comment in comments) {
-                    if (id == comment.idComment) {
-                        if (!comment.delete) {
-                            comment.delete//делаем true
-                            return true
-                        } else {
-                            throw AccessDeniedException("Ошибка доступа: Комментарий уже удален")
+                for (note in notes) {
+                    if (idEntity == note.id) {
+                        for (comment in note.comments.commentList) {
+                            if (id == comment.idComment) {
+                                if (!comment.delete) {
+                                    comment.delete//делаем true
+                                    return true
+                                } else {
+                                    throw AccessDeniedException("Ошибка доступа: Комментарий уже удален")
+                                }
+                            }
                         }
+                        throw NotFoundException("Комментарий с id $id - не найден")
                     }
                 }
-
-
-                throw NotFoundException("Комментарий с id $id - не найден")
+                throw NotFoundException("Заметка с id $idEntity не найдена")
             }
 
             else -> throw NotMatchTypeException("Тип не соответствует необходимому")
@@ -241,7 +294,7 @@ object WallService : CrudService<Entity> {
 
 
     override fun editComment(entityType: Class<out Entity>, idEntity: Int, commentId: Int, message: String): Boolean {
-        return when (entityType) {
+        when (entityType) {
             Post::class.java -> {
                 for (post in posts) {
                     if (post.id == idEntity) {
@@ -297,7 +350,7 @@ object WallService : CrudService<Entity> {
                             }
                         }
                     }
-                    throw NotFoundException("Не нашли комментарий с id: $commentId")
+                    throw NotFoundException("Не нашли комментарий с id: $commentId, возможно он не удален, или отсутствует вовсе")
                 }
                 throw NotFoundException("Пост с id $idEntity не найден")
 
@@ -313,7 +366,7 @@ object WallService : CrudService<Entity> {
                             }
                         }
                     }
-                    throw NotFoundException("Не нашли комментарий с id: $commentId")
+                    throw NotFoundException("Не нашли комментарий с id: $commentId, возможно он не удален, или отсутствует вовсе")
                 }
                 throw NotFoundException("Заметка с id $idEntity не найдена")
 
@@ -323,7 +376,8 @@ object WallService : CrudService<Entity> {
         }
     }
 
-    override fun getComments(entityType: Class<out Entity>, idEntity: Int): Comment {
+    override fun getComments(entityType: Class<out Entity>, idEntity: Int): List<Comment> {
+        val resultList = mutableListOf<Comment>()
         when (entityType) {
             Post::class.java -> {
                 for (post in posts) {
@@ -331,12 +385,14 @@ object WallService : CrudService<Entity> {
                         for (comment in post.comments.commentList) {
                             if (!comment.delete) {
                                 println("\n")
-                                return comment
+                                resultList.add(comment)
                             }
                         }
-                        throw NotFoundException("Список комментариев пуст")
+
+                        if (resultList.isEmpty()) throw NotFoundException("Список комментариев пуст")
 
                     }
+                    return resultList
                 }
                 throw NotFoundException("Такой пост отсутствует..")
             }
@@ -346,34 +402,39 @@ object WallService : CrudService<Entity> {
                     if (idEntity == note.id) {
                         for (comment in note.comments.commentList) {
                             if (!comment.delete) {
-                                println("\n")
-                                return comment
+                                resultList.add(comment)
                             }
                         }
-                        throw NotFoundException("Список комментариев пуст")
+                        if (resultList.isEmpty()) {
+                            throw NotFoundException("Список комментариев пуст")
+                        }
+                        return resultList
 
                     }
                 }
                 throw NotFoundException("Такая заметка отсутствует..")
             }
-            else -> { throw NotMatchTypeException("Не соответствующий тип")}
+
+            else -> {
+                throw NotMatchTypeException("Не соответствующий тип")
+            }
 
         }
-    }
-
-        fun clear() {
-            notes.clear()
-            idNote = 0
-
-            comments.clear()
-            commentId = 0
-
-            posts.clear()
-            postId = 0
-        }
-
 
     }
+
+    fun clear() {
+        notes.clear()
+        idNote = 0
+
+        commentId = 0
+
+        posts.clear()
+        postId = 0
+    }
+
+
+}
 
 
 

@@ -2,7 +2,7 @@ package ru.lion_of_steel.attachment
 
 sealed class Attachment(open val type: String)
 
-    class Audio(
+    data class Audio(
         override val type: String = "Audio",
         val id: Int? = null,
         val ownerId: Int? = null,
@@ -17,7 +17,7 @@ sealed class Attachment(open val type: String)
     class AudioAttachment(audio: Audio) : Attachment(audio.type)
 
 
-    class Video(
+    data class Video(
         override val type: String = "Video",
         val id: Int? = null,
         val ownerId: Int? = null,
@@ -28,7 +28,7 @@ sealed class Attachment(open val type: String)
         val views: Int? = null,
     ) : Attachment(type)
 
-    class Frame( //Изображение первого кадра.
+    data class Frame( //Изображение первого кадра.
         val height: Int? = null,
         val url: String? = null,
         val width: Int? = null
@@ -37,7 +37,7 @@ sealed class Attachment(open val type: String)
 
     class VideoAttachment(video: Video) : Attachment(video.type)
 
-    class Photo(
+    data class Photo(
         override val type: String = "Photo",
         val id: Int? = null,
         val albumId: Int? = null,
@@ -48,7 +48,7 @@ sealed class Attachment(open val type: String)
     ) : Attachment(type)
 
     class PhotoAttachment(photo: Photo) : Attachment(photo.type)
-    class File(
+    data class File(
         override val type: String = "File",
         val id: Int? = null,
         val ownerId: Int? = null,
@@ -60,7 +60,7 @@ sealed class Attachment(open val type: String)
 
     class FileAttachment(file: File) : Attachment(file.type)
 
-    class Link(
+   data  class Link(
         override val type: String = "Link",
         val url: String? = null,
         val title: String? = null,
