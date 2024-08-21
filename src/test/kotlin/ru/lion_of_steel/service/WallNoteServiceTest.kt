@@ -10,7 +10,6 @@ import ru.lion_of_steel.exception.ReportNoOwnerAndCommentIdException
 import ru.lion_of_steel.model.Comment
 import ru.lion_of_steel.model.Note
 import ru.lion_of_steel.model.ReportComment
-import java.lang.NullPointerException
 
 class WallNoteServiceTest {
     @Before
@@ -45,7 +44,7 @@ class WallNoteServiceTest {
     @Test(expected = NotFoundException::class)
     fun editNoteNoFoundId() {
         WallService.add(Note(1, delete = true))
-        WallService.edit(Note(1, text = "ldsfasf"))
+        WallService.edit(Note(1, text = "hello"))
 
         //проверка на Exception
     }

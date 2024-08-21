@@ -218,7 +218,7 @@ object WallService : CrudService<Entity> {
         }
     }
 
-    override fun createComment(entityType: Class<out Entity>, id: Int, comment: Comment): Comment {
+    override  fun createComment(entityType: Class<out Entity>, id: Int, comment: Comment): Comment {
         when (entityType) {
             Post::class.java -> {
                 for (post in posts) {

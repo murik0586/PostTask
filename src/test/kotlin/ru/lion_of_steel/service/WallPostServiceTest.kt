@@ -43,7 +43,7 @@ class WallPostServiceTest {
     @Test(expected = NotFoundException::class)
     fun editPostNoFoundId() {
         WallService.add(Post(1, delete = true))
-        WallService.edit(Post(1, contentText = "ldsfasf"))
+        WallService.edit(Post(1, contentText = "hello"))
 
         //проверка на Exception
     }

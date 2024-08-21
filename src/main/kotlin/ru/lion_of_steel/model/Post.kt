@@ -24,7 +24,8 @@ data class Post(
     val isFavorite: Boolean? = false,//добавлен в закладки у текущего пользователя.
     val postponedId: Boolean? = true,//Идентификатор отложенной записи.
     var delete: Boolean = false,
-) : Entity
+
+    ) : Entity
 
 fun updateLikes(post: Post): Likes {
     val userLikes = post.likes.userLikes ?: false
