@@ -48,8 +48,18 @@ data class User(
        return "У вас ${ChatService.getUnreadChatsCount(this)} непрочитанных чатов!"
     }
     fun getUserChats() {//получить список чатов
-        ChatService.getChats(this)
+        println("Ваш список чатов: ${ChatService.getChats(this)}")
+
     }
+    fun deleteChat(userWhich: User): Boolean {
+        val chatDelete = chats[userWhich]
+            if(chatDelete!=null) {
+                ChatService.delete(chatDelete)
+                return true
+            }
+        return false
+        }
+
 
 }
 
