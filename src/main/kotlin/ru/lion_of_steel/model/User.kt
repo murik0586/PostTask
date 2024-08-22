@@ -20,12 +20,37 @@ data class User(
         }
         chatUsers.addMessage(message)
     }
-    fun editMessage() {
-
+    fun editMessage(userWhich: User,idMessage: Int,newTextMessage: String) {
+        val chat = chats[userWhich] ?: throw NotFoundException("Чат с пользователем ${userWhich.name} не найден.")
+        for((index,message) in chat.messages.withIndex()) {
+            if(message.id == idMessage) {
+                chat.messages[index] = message.copy(text = newTextMessage)
+                return
+            }
+        }
+        throw NotFoundException("Сообщение с $idMessage не найдено")
     }
-    fun deleteMessage() {
-
+    fun deleteMessage(userWhich: User,idMessage: Int) {
+        val chat = chats[userWhich] ?: throw NotFoundException("Чат с пользователем ${userWhich.name} не найден.")
+        val messageIterator = chat.messages.iterator()
+        while (messageIterator.hasNext()) {
+            val message = messageIterator.next()
+            if (message.id == idMessage) {
+                messageIterator.remove()
+                return
+            }
+        }
+        throw NotFoundException("Сообщение с ID $idMessage не найдено")
     }
+
+
+    fun countUnreadChats(): String {
+       return "У вас ${ChatService.getUnreadChatsCount(this)} непрочитанных чатов!"
+    }
+    fun getUserChats() {//получить список чатов
+        ChatService.getChats(this)
+    }
+
 }
 
 
