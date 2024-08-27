@@ -2,10 +2,8 @@ package ru.lion_of_steel.model
 
 import ru.lion_of_steel.exception.NotFoundException
 
-//TODO СООБЩЕНИЯ
-// TASK 9 В каждом чате есть прочитанные и непрочитанные сообщения.
+//TODO СООБЩЕНИЯ:
 //TODO для пользователя:
-// TASK 12 Получить список последних сообщений из чатов (можно в виде списка строк). Если сообщений в чате нет (все были удалены), то пишется «нет сообщений».
 // TASK 13 Получить список сообщений из чата, указав:
 // ID собеседника;
 // количество сообщений. После того как вызвана эта функция, все отданные сообщения автоматически считаются прочитанными.
@@ -19,7 +17,7 @@ import ru.lion_of_steel.exception.NotFoundException
 data class Chat(
     override var id: Int,
     val pairUser: Pair<User, User>,
-    var messages: MutableList<Message> = mutableListOf<Message>()
+    var messages: MutableList<Message> = mutableListOf()
 ) : Entity {
     private var messageIdCounter = 0
     fun addMessage(message: Message): Message {
@@ -33,7 +31,7 @@ data class Message(
     override val id: Int = 0,
     val text: String? = "Это мое сообщение! ",
     var sender: User,//отправитель сообщения
-    val readOrNot: Boolean = false,//прочитано или нет.
+    var readOrNot: Boolean = false,//прочитано или нет.
 ) : Entity
 
 object ChatService {
@@ -47,7 +45,8 @@ object ChatService {
             entity.id = ++idChat
             return true
         }
-        return false//TODO после завершения задания модифицировать, так чтобы когда очищался чат у одного - другого не очищался.
+        return false//TODO после завершения задания модифицировать, так чтобы когда очищался чат у одного - другого не очищался
+    // но тогда надо будет сделать так, чтобы у удалившего чат создавался новый чат после отправки им или другим пользователем сообщения.
     }
 
     fun delete(entity: Chat): Boolean {
