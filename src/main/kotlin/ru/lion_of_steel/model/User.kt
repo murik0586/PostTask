@@ -1,10 +1,9 @@
 package ru.lion_of_steel.model
 
 import ru.lion_of_steel.exception.NotFoundException
+import ru.lion_of_steel.service.ChatService
+import ru.lion_of_steel.service.ServiceUser
 
-//TODO это версия где все это еще не храниться в общем сервисе!После реализации
-// этого подхода - попробовать другой, где все храниться в сервисах
-// Улучшить алгоритмы!
 data class User(
     override val id: Int,
     var name: String,
@@ -82,7 +81,8 @@ data class User(
                 }
             }
         }
-        fun getLastMessagesFromOneChat(idUser: Int) { //TODO доработать, нужно еще количество сообщений указать, по умолчанию = 10!
+        fun getLastMessagesFromOneChat(idUser: Int, countMessage: Int = 10) {
+            var count = 0
             for (chat in chats) {
                 val nameUser = chat.key
                 val chatUser = chat.value.messages
@@ -95,7 +95,9 @@ data class User(
                             if (message.sender != this) {
                                 println(message)
                                 message.readOrNot = true
+                                count++
                             }
+                            if(count >= countMessage) break
                         }
                     }
                 }
@@ -103,39 +105,27 @@ data class User(
         }
     }
 
-}
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
+        other as User
 
-object ServiceUser {
-    private var users = mutableListOf<User>()
-    private var idUser = 0
-    fun addUser(user: User): User {
-        users += user.copy(id = ++idUser)
-        return users.last()
+        if (id != other.id) return false
+        if (name != other.name) return false
+
+        return true
     }
 
-    fun getUsers(): List<User> {
-        val resultUsersList = mutableListOf<User>()
-        if (users.isEmpty()) throw NotFoundException("Пользователей нет")
-        for (user in users) {
-            resultUsersList.add(user)
-        }
-        return resultUsersList
+    override fun hashCode(): Int {
+        var result = 17
+        result = 31 * result + id.hashCode()
+        result = 31 * result + name.hashCode()
+        return result
     }
 
-    fun getUser(user: User, userTwo: User): Boolean {
-        if (users.contains(user) && users.contains(userTwo)) return true
-        else throw NotFoundException("Один из пользователей не существует!")
+    override fun toString(): String {
+        return name
     }
 
-    fun clear() {
-        users.clear()
-        idUser = 0
-    }
-}
-
-fun main() {
-    val user = ServiceUser.addUser(User(1, "Мурат"))
-    val userTwo = ServiceUser.addUser(User(2, "Тимур"))
-    user.pushMessage(userTwo, Message(1, sender = user))
 }

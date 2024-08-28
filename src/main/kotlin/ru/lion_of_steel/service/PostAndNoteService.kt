@@ -97,6 +97,9 @@ object WallService : CrudService<Entity> {
             else -> null
         }
     }
+//    fun <T> MutableList<T>.add(entity: T) {
+//
+//    }
 
 
     override fun edit(entity: Entity): Boolean {
