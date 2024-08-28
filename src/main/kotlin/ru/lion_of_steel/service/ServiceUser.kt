@@ -7,9 +7,12 @@ object ServiceUser {
 
     private var users = mutableListOf<User>()
     private var idUser = 0
-    fun addUser(user: User): User {
-        users += user.copy(id = ++idUser)
-        return users.last()
+    fun addUser( userType: User): User {
+
+            users += userType.copy(id = ++idUser)
+            return users.last()
+
+
     }
 
     fun getUsers(): List<User> {
