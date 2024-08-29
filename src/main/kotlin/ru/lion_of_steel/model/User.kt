@@ -2,7 +2,6 @@ package ru.lion_of_steel.model
 
 import ru.lion_of_steel.exception.NotFoundException
 import ru.lion_of_steel.service.ChatService
-import ru.lion_of_steel.service.ServiceUser
 
 data class User(
     override val id: Int,
@@ -32,14 +31,14 @@ data class User(
         throw NotFoundException("Сообщение с id: $idMessage не найдено")
     }
 
-    fun deleteMessage(userWhich: User, idMessage: Int) {
+    fun deleteMessage(userWhich: User, idMessage: Int): String {
         val chat = chats[userWhich] ?: throw NotFoundException("Чат с пользователем ${userWhich.name} не найден.")
         val messageIterator = chat.messages.iterator()
         while (messageIterator.hasNext()) {
             val message = messageIterator.next()
             if (message.id == idMessage) {
                 messageIterator.remove()
-                return
+                return "Сообщение удалено"
             }
         }
         throw NotFoundException("Сообщение с ID $idMessage не найдено")
@@ -50,8 +49,8 @@ data class User(
         return "У вас ${ChatService.getUnreadChatsCount(this)} непрочитанных чатов!"
     }
 
-    fun getUserChats() {//получить список чатов
-        println("Ваш список чатов: ${ChatService.getChats(this)}")
+    fun getUserChats(): String {//получить список чатов
+        return "Ваш список чатов: ${ChatService.getChats(this)}"
 
     }
 
@@ -64,53 +63,61 @@ data class User(
         return false
     }
 
-    fun getLastMessagesFromChats() {
+    fun getLastMessagesFromChats(): Message? {
+
         if (chats.isEmpty()) throw NotFoundException("Список чатов пуст!")
 
         for (chat in chats) {
             val nameUser = chat.key
             val chatUser = chat.value.messages
+
             if (chatUser.isEmpty()) {
                 println("Нет сообщений от $nameUser")
             } else {
                 println("Сообщения от $nameUser: ")
-                var lastUnreadMessage: Message? = null
-                for (message in chatUser) {
+                for (message in chatUser.reversed()) {
                     if (message.sender != this && !message.readOrNot) {
-                        lastUnreadMessage = message
+                        return message
 
                     }
                 }
-                if(lastUnreadMessage!=null) {
-                    println(lastUnreadMessage)
-                } else {
-                    println("Нет непрочитанных сообщений от $nameUser")
-                }
+                println("Нет непрочитанных сообщений от $nameUser")
             }
         }
-        fun getLastMessagesFromOneChat(idUser: Int, countMessage: Int = 10) {
-            var count = 0
-            for (chat in chats) {
-                val nameUser = chat.key
-                val chatUser = chat.value.messages
-                if (nameUser.id == idUser) {
-                    if (chatUser.isEmpty()) {
-                        println("Нет новых сообщений")
-                    } else {
-                        println("Сообщения от $nameUser: ")
-                        for (message in chatUser) {
-                            if (message.sender != this) {
-                                println(message)
-                                message.readOrNot = true
-                                count++
-                            }
-                            if(count >= countMessage) break
+        println("Непрочитанные сообщения не найдены")
+        return null
+    }
+
+    fun getLastMessagesFromOneChat(idUser: Int, countMessage: Int = 10): List<Message> {
+        val listResult = mutableListOf<Message>()
+        var count = 0
+
+        for (chat in chats) {
+            val nameUser = chat.key
+            val chatUser = chat.value.messages
+
+            if (nameUser.id == idUser) {
+                if (chatUser.isEmpty()) {
+                    println("Нет новых сообщений")
+                } else {
+                    println("Сообщения от $nameUser: ")
+
+                    for (message in chatUser) {
+                        if (message.sender != this) {
+                            listResult.add(message)
+                            count++
+                            if (count>= countMessage) break
                         }
                     }
                 }
             }
         }
+        for (message in listResult) {
+            message.readOrNot = true
+        }
+        return listResult
     }
+
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
