@@ -12,24 +12,24 @@ data class User(
     var notes: List<Note>? = mutableListOf(),//потом перенести сюда заметки
 
 ) : Entity {
-    fun pushMessage(userWhich: User, message: Message) {
+    fun pushMessage(userWhich: User, message: Message): Message {
         val chatUsers = chats.getOrPut(userWhich) {
             val newChat = Chat(0, Pair(this, userWhich))
             ChatService.add(newChat)
             newChat
         }
-        chatUsers.addMessage(message)
+        return chatUsers.addMessage(message)
     }
 
-    fun editMessage(userWhich: User, idMessage: Int, newTextMessage: String) {
+    fun editMessage(userWhich: User, idMessage: Int, newTextMessage: String): Message {
         val chat = chats[userWhich] ?: throw NotFoundException("Чат с пользователем ${userWhich.name} не найден.")
         for ((index, message) in chat.messages.withIndex()) {
             if (message.id == idMessage) {
                 chat.messages[index] = message.copy(text = newTextMessage)
-                return
+                return chat.messages.last()
             }
         }
-        throw NotFoundException("Сообщение с $idMessage не найдено")
+        throw NotFoundException("Сообщение с id: $idMessage не найдено")
     }
 
     fun deleteMessage(userWhich: User, idMessage: Int) {
@@ -64,7 +64,7 @@ data class User(
         return false
     }
 
-    fun getLastMessagesFromChats() {//TODO доработать! и также ограничить чтобы выводились непрочитанные сообщения, или последние 5!
+    fun getLastMessagesFromChats() {
         if (chats.isEmpty()) throw NotFoundException("Список чатов пуст!")
 
         for (chat in chats) {
@@ -74,10 +74,17 @@ data class User(
                 println("Нет сообщений от $nameUser")
             } else {
                 println("Сообщения от $nameUser: ")
+                var lastUnreadMessage: Message? = null
                 for (message in chatUser) {
-                    if (message.sender != this) {
-                        println(message)
+                    if (message.sender != this && !message.readOrNot) {
+                        lastUnreadMessage = message
+
                     }
+                }
+                if(lastUnreadMessage!=null) {
+                    println(lastUnreadMessage)
+                } else {
+                    println("Нет непрочитанных сообщений от $nameUser")
                 }
             }
         }
