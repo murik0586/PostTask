@@ -98,7 +98,7 @@ data class User(
 
             if (nameUser.id == idUser) {
                 if (chatUser.isEmpty()) {
-                    println("Нет новых сообщений")
+                    throw NotFoundException("Нет сообщений")
                 } else {
                     println("Сообщения от $nameUser: ")
 
