@@ -79,6 +79,7 @@ fun clear(){
         val exception = mutableListOf(Pair(user1, chat1), Pair(user1, chat2))
         val result = ChatService.getChats(user1)
 
+
         assertEquals(exception, result)
     }
 
