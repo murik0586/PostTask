@@ -1,6 +1,6 @@
 package ru.lion_of_steel.service
 
-import ru.lion_of_steel.exception.NotFoundException
+
 import ru.lion_of_steel.model.Chat
 import ru.lion_of_steel.model.User
 
@@ -29,31 +29,13 @@ object ChatService {
         }
         return false
     }
+    fun User.getAllChats(): List<Pair<User, Chat>> {
 
-    fun getChats(user: User): List<Pair<User, Chat>> {//получение чатов
-
-        val resultList = mutableListOf<Pair<User, Chat>>()
-        if (user.chats.entries.isEmpty()) throw NotFoundException("У вас еще нет чатов!")
-        for (entry in user.chats.entries) {
-            val chatPair = Pair(user, entry.value)
-            resultList.add(chatPair)
-        }
-        return resultList
+        return this.chats.entries.map { Pair(it.key, it.value) }
     }
 
-    fun getUnreadChatsCount(user: User): Int {//проверка сколько непрочитанных чатов у пользователя
-        var unreadChatsCount = 0
-        if (user.chats.isEmpty()) throw NotFoundException("У вас еще нет чатов!")
-        for (chat in user.chats.values) {
-            for (message in chat.messages) {
-                if (!message.readOrNot) {
-                    unreadChatsCount++
-                    break
-                }
-            }
-
-        }
-        return unreadChatsCount
+    fun User.getUnreadChatsCount(): Int {
+        return this.chats.values.count { chat -> chat.messages.any { !it.readOrNot } }
     }
 
     fun clear() {

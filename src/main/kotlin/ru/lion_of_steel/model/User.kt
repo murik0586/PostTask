@@ -2,6 +2,8 @@ package ru.lion_of_steel.model
 
 import ru.lion_of_steel.exception.NotFoundException
 import ru.lion_of_steel.service.ChatService
+import ru.lion_of_steel.service.ChatService.getAllChats
+import ru.lion_of_steel.service.ChatService.getUnreadChatsCount
 
 data class User(
     override val id: Int,
@@ -46,11 +48,11 @@ data class User(
 
 
     fun countUnreadChats(): String {
-        return "У вас ${ChatService.getUnreadChatsCount(this)} непрочитанных чатов!"
+        return "У вас ${this.getUnreadChatsCount()} непрочитанных чатов!"
     }
 
     fun getUserChats(): String {//получить список чатов
-        return "Ваш список чатов: ${ChatService.getChats(this)}"
+        return "Ваш список чатов: ${this.getAllChats()}"
 
     }
 
