@@ -1,6 +1,5 @@
 package ru.lion_of_steel.service
 
-
 import ru.lion_of_steel.model.Chat
 import ru.lion_of_steel.model.User
 
