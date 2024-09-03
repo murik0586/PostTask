@@ -125,7 +125,7 @@ class UserTest {
         val chat1 = Chat(1, Pair(user, userTwo))
         ChatService.add(chat1)
         user.pushMessage(userTwo, message)
-        val expectList = mutableListOf(Pair(user, chat1))
+        val expectList = mutableListOf(Pair(userTwo, chat1))
         val expected = "Ваш список чатов: $expectList"
         val result = user.getUserChats()
         assertEquals(expected, result)
