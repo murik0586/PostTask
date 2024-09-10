@@ -14,36 +14,38 @@ data class User(
 
 ) : Entity {
     fun pushMessage(userWhich: User, message: Message): Message {
-        val chatUsers = chats.getOrPut(userWhich) {
-            val newChat = Chat(0, Pair(this, userWhich))
-            ChatService.add(newChat)
-            newChat
-        }
-        return chatUsers.addMessage(message)
+        return chats.getOrPut(userWhich) {
+            Chat(0, Pair(this, userWhich)).also { ChatService.add(it) }
+        }.addMessage(message)
     }
+
 
     fun editMessage(userWhich: User, idMessage: Int, newTextMessage: String): Message {
         val chat = chats[userWhich] ?: throw NotFoundException("Чат с пользователем ${userWhich.name} не найден.")
-        for ((index, message) in chat.messages.withIndex()) {
-            if (message.id == idMessage) {
-                chat.messages[index] = message.copy(text = newTextMessage)
-                return chat.messages.last()
-            }
-        }
-        throw NotFoundException("Сообщение с id: $idMessage не найдено")
+        val message = chat.messages.find { it.id == idMessage }
+            ?: throw NotFoundException("Сообщение с id: $idMessage не найдено")
+        val updateMessage = message.copy(text = newTextMessage)
+        chat.messages[chat.messages.indexOf(message)] = updateMessage
+        return updateMessage
     }
+
 
     fun deleteMessage(userWhich: User, idMessage: Int): String {
         val chat = chats[userWhich] ?: throw NotFoundException("Чат с пользователем ${userWhich.name} не найден.")
-        val messageIterator = chat.messages.iterator()
-        while (messageIterator.hasNext()) {
-            val message = messageIterator.next()
-            if (message.id == idMessage) {
-                messageIterator.remove()
-                return "Сообщение удалено"
-            }
-        }
-        throw NotFoundException("Сообщение с ID $idMessage не найдено")
+        val message = chat.messages.find { it.id == idMessage }
+            ?: throw NotFoundException("Сообщение с id: $idMessage не найдено")
+        chat.messages.remove(message)
+        return "Сообщение удалено"
+//        val chat = chats[userWhich] ?: throw NotFoundException("Чат с пользователем ${userWhich.name} не найден.")
+//        val messageIterator = chat.messages.iterator()
+//        while (messageIterator.hasNext()) {
+//            val message = messageIterator.next()
+//            if (message.id == idMessage) {
+//                messageIterator.remove()
+//                return "Сообщение удалено"
+//            }
+//        }
+//        throw NotFoundException("Сообщение с ID $idMessage не найдено")
     }
 
 
@@ -57,40 +59,57 @@ data class User(
     }
 
     fun deleteChat(userWhich: User): Boolean {
-        val chatDelete = chats[userWhich]
-        if (chatDelete != null) {
-            ChatService.delete(chatDelete)
-            return true
-        }
-        return false
+        return chats[userWhich]?.let { chat ->
+            ChatService.delete(chat)
+            true
+        } ?: false
+
+//        val chatDelete = chats[userWhich]
+//        if (chatDelete != null) {
+//            ChatService.delete(chatDelete)
+//            return true
+//        }
+//        return false
+
     }
 
     fun getLastMessagesFromChats(): Message? {
-
         if (chats.isEmpty()) throw NotFoundException("Список чатов пуст!")
-
-        for (chat in chats) {
-            val nameUser = chat.key
-            val chatUser = chat.value.messages
-
-            if (chatUser.isEmpty()) {
-                println("Нет сообщений от $nameUser")
-            } else {
-                println("Сообщения от $nameUser: ")
-                for (message in chatUser.reversed()) {
-                    if (message.sender != this && !message.readOrNot) {
-                        return message
-
-                    }
-                }
-                println("Нет непрочитанных сообщений от $nameUser")
+        return chats.asSequence()
+            .mapNotNull { (user, chat) ->
+                chat.messages.lastOrNull { message -> message.sender != this && !message.readOrNot }
+                    ?.also { println("Сообщения от $user: $it") }
             }
-        }
-        println("Непрочитанные сообщения не найдены")
-        return null
+            .lastOrNull()
+            ?: run {
+                println("Непрочитанные сообщения не найдены")
+                null
+
+
+            }
+//        for (chat in chats) {
+//            val nameUser = chat.key
+//            val chatUser = chat.value.messages
+//
+//            if (chatUser.isEmpty()) {
+//                println("Нет сообщений от $nameUser")
+//            } else {
+//                println("Сообщения от $nameUser: ")
+//                for (message in chatUser.reversed()) {
+//                    if (message.sender != this && !message.readOrNot) {
+//                        return message
+//
+//                    }
+//                }
+//                println("Нет непрочитанных сообщений от $nameUser")
+//            }
+//        }
+//        println("Непрочитанные сообщения не найдены")
+//        return null
     }
 
     fun getLastMessagesFromOneChat(idUser: Int, countMessage: Int = 10): List<Message> {
+
         val listResult = mutableListOf<Message>()
         var count = 0
 
@@ -108,7 +127,7 @@ data class User(
                         if (message.sender != this) {
                             listResult.add(message)
                             count++
-                            if (count>= countMessage) break
+                            if (count >= countMessage) break
                         }
                     }
                 }

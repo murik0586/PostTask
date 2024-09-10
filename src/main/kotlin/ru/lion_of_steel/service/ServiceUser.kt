@@ -7,26 +7,20 @@ object ServiceUser {
 
     private var users = mutableListOf<User>()
     private var idUser = 0
-    fun addUser( userType: User): User {
 
-            users += userType.copy(id = ++idUser)
-            return users.last()
+    fun addUser(userType: User): User {
 
+        users += userType.copy(id = ++idUser)
+        return users.last()
 
     }
 
     fun getUsers(): List<User> {
-        val resultUsersList = mutableListOf<User>()
-        if (users.isEmpty()) throw NotFoundException("Пользователей нет")
-        for (user in users) {
-            resultUsersList.add(user)
-        }
-        return resultUsersList
+        return users.ifEmpty { throw NotFoundException("Пользователей нет") }.toList()
     }
 
     fun getUser(user: User, userTwo: User): Boolean {
-        if (users.contains(user) && users.contains(userTwo)) return true
-        else throw NotFoundException("Один из пользователей не существует!")
+        return users.contains(user) && users.contains(userTwo) || throw NotFoundException("Один из пользователей не существует!")
     }
 
     fun clear() {

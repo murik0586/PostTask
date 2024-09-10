@@ -1,15 +1,5 @@
 package ru.lion_of_steel.model
 
-
-//TODO СООБЩЕНИЯ:
-//TODO для пользователя:
-// TASK 18 использовать lambda-функции (их напишите сами)
-// TASK 19 и extension-функции (есть в составе Iterable, Collection, List).
-
-//TODO Расчёт статистики производить как цепочку вызовов lambda-функций.
-// Попробуйте обойтись без for, while и do-while.
-// TASK 20 авто-тесты
-
 data class Chat(
     override var id: Int,
     val pairUser: Pair<User, User>,
