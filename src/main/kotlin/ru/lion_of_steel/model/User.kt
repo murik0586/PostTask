@@ -36,16 +36,6 @@ data class User(
             ?: throw NotFoundException("Сообщение с id: $idMessage не найдено")
         chat.messages.remove(message)
         return "Сообщение удалено"
-//        val chat = chats[userWhich] ?: throw NotFoundException("Чат с пользователем ${userWhich.name} не найден.")
-//        val messageIterator = chat.messages.iterator()
-//        while (messageIterator.hasNext()) {
-//            val message = messageIterator.next()
-//            if (message.id == idMessage) {
-//                messageIterator.remove()
-//                return "Сообщение удалено"
-//            }
-//        }
-//        throw NotFoundException("Сообщение с ID $idMessage не найдено")
     }
 
 
@@ -64,13 +54,6 @@ data class User(
             true
         } ?: false
 
-//        val chatDelete = chats[userWhich]
-//        if (chatDelete != null) {
-//            ChatService.delete(chatDelete)
-//            return true
-//        }
-//        return false
-
     }
 
     fun getLastMessagesFromChats(): Message? {
@@ -87,56 +70,21 @@ data class User(
 
 
             }
-//        for (chat in chats) {
-//            val nameUser = chat.key
-//            val chatUser = chat.value.messages
-//
-//            if (chatUser.isEmpty()) {
-//                println("Нет сообщений от $nameUser")
-//            } else {
-//                println("Сообщения от $nameUser: ")
-//                for (message in chatUser.reversed()) {
-//                    if (message.sender != this && !message.readOrNot) {
-//                        return message
-//
-//                    }
-//                }
-//                println("Нет непрочитанных сообщений от $nameUser")
-//            }
-//        }
-//        println("Непрочитанные сообщения не найдены")
-//        return null
     }
 
     fun getLastMessagesFromOneChat(idUser: Int, countMessage: Int = 10): List<Message> {
+        val user = chats.keys.find { it.id == idUser } ?: throw throw NotFoundException("Пользователь не найден")
+        val chat = chats[user] ?: throw NotFoundException("Чат не найден!")
 
-        val listResult = mutableListOf<Message>()
-        var count = 0
+        val result = chat.messages
+            .asSequence()
+            .filter { it.sender != this }
+            .take(countMessage)
+            .onEach { it.readOrNot = true }
+            .toList()
+        if (result.isEmpty()) throw NotFoundException("Нет сообщений")
 
-        for (chat in chats) {
-            val nameUser = chat.key
-            val chatUser = chat.value.messages
-
-            if (nameUser.id == idUser) {
-                if (chatUser.isEmpty()) {
-                    throw NotFoundException("Нет сообщений")
-                } else {
-                    println("Сообщения от $nameUser: ")
-
-                    for (message in chatUser) {
-                        if (message.sender != this) {
-                            listResult.add(message)
-                            count++
-                            if (count >= countMessage) break
-                        }
-                    }
-                }
-            }
-        }
-        for (message in listResult) {
-            message.readOrNot = true
-        }
-        return listResult
+        return result
     }
 
 

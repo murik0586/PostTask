@@ -32,7 +32,6 @@ object ChatService {
     }
 
     fun User.getAllChats(): List<Pair<User, Chat>> {
-
         return this.chats.entries.map { Pair(it.key, it.value) }//получаем список чатов у определенного пользователя
     }
 
